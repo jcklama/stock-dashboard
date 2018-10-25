@@ -203,19 +203,164 @@ template {
 
 /* Actual styles start here */
 * {
-  font-family: "Libre Baskerville", serif;
+  font-family: "Julius Sans One", sans-serif;
 }
 
 main {
   display: flex;
 }
+/* LEFT */
+.left {
+  width: 60vw;
+}
 
 .top {
   display: flex;
   flex-direction: column;
-  height: 40vh;
+  justify-content: center;
+  align-items: center;
+  height: 55vh;
+  background-color: lightblue;
+}
+
+.top h1,
+.top h2 {
+  text-align: left;
+}
+
+.top h1 {
+  font-size: 70px;
+  margin: 0;
+  letter-spacing: 15px;
+  text-shadow: 1px 1px whitesmoke;
+  font-weight: 700;
+  z-index: 10;
+  position: relative;
+}
+
+.top h2 {
+  margin: 0;
+  font-size: 15px;
 }
 
 .bottom {
-  height: 60vh;
+  height: 45vh;
+  background: lavenderblush;
+  padding: 25px;
+}
+
+#tickerSearch {
+  border: 1px solid darkgrey;
+  width: 150px;
+  height: 25px;
+  padding: 5px;
+  border-radius: 3px;
+  font-family: "Julius Sans One", sans-serif;
+}
+
+#tickerSearch:hover {
+  border: 1px solid black;
+}
+
+.tickerSearch::webkit-input-placeholder {
+  font-family: "Julius Sans One", sans-serif;
+}
+
+.fbox {
+  height: 70px;
+  width: 300px;
+  position: absolute;
+  background: pink;
+  border-radius: 2px;
+  opacity: 0.25;
+  top: 130px;
+  left: 400px;
+}
+/* RIGHT */
+.right {
+  width: 40vw;
+  padding: 15px 25px;
+  background: white;
+}
+
+#composition,
+#holdings {
+  margin: 0;
+  border-bottom: 2px solid black;
+}
+
+.holdings {
+  height: 36vh;
+  overflow: scroll;
+}
+
+.info {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 43px;
+}
+
+.subtotals {
+  padding: 10px 0 10px 0;
+  /* border-bottom: 2px solid black; */
+  border-top: 2px solid black;
+}
+
+.bottom-right {
+  /* width: 50%; */
+}
+
+.subtotal,
+.total,
+.bottom-right {
+  display: flex;
+  justify-content: space-between;
+  /* width: 50%; */
+}
+
+.amount {
+  margin: 0;
+}
+
+.subtotal h3,
+.taxes h3,
+.total h3 {
+  margin: 0;
+}
+
+.summary {
+  /* position: relative;
+  bottom: 43px; */
+  border-collapse: collapse;
+  overflow: scroll;
+  width: 100%;
+}
+
+.summary tr th {
+  margin: 0 20px 0 0;
+  /* text-decoration: underline; */
+  /* border-bottom: 1px solid black; */
+  text-align: right;
+  font-size: 10px;
+  text-decoration: none;
+}
+
+/* #total-holdings {
+  border-right: 1px solid black;
+  border-left: 1px solid black;
+} */
+/* 
+th,
+td {
+  padding-left: 5px;
+  padding-right: 5px;
+} */
+#stock-heading,
+#td1 {
+  text-align: center;
+}
+
+#td2,
+#td3 {
+  text-align: right;
 }
