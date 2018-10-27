@@ -219,7 +219,7 @@ main {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 55vh;
+  height: 45vh;
   background-color: lightblue;
 }
 
@@ -244,9 +244,13 @@ main {
 }
 
 .bottom {
-  height: 45vh;
+  height: 55vh;
   background: lavenderblush;
   padding: 25px;
+}
+
+.bottom-search-bar {
+  display: flex;
 }
 
 #tickerSearch {
@@ -276,10 +280,69 @@ main {
   top: 130px;
   left: 400px;
 }
+
+.fa-info-circle {
+  position: relative;
+}
+
+.fa-info-circle:hover #searchNote {
+  display: block;
+}
+
+#searchNote {
+  font-size: 9px;
+  position: absolute;
+  top: -28px;
+  left: 0;
+  width: 285px;
+  height: 25px;
+  padding: 5px;
+  border-radius: 2px;
+  display: none;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
+}
+
+#searchNote p {
+  margin: 0;
+  color: whitesmoke;
+  position: relative;
+  top: -1px;
+}
+
+#addToHoldings {
+  border: 1px solid darkgrey;
+  margin-left: 5px;
+  border-radius: 2px;
+  font-family: "Julius Sans One", sans-serif;
+  padding: 2px 3px;
+}
+
+#addToHoldings:hover {
+  border: 1px solid black;
+}
+
+#addToHoldings:hover {
+  cursor: pointer;
+}
+
+#resultsTable {
+  width: 100%;
+  padding-top: 10px;
+}
+
+.stockPrices {
+  text-align: center;
+}
+
+#no-results {
+  padding-top: 10px;
+  width: 100%;
+  text-align: center;
+}
+
 /* RIGHT */
 .right {
   width: 40vw;
-  padding: 15px 25px;
   background: white;
 }
 
@@ -290,7 +353,7 @@ main {
 }
 
 .holdings {
-  height: 36vh;
+  height: 25vh;
   overflow: scroll;
 }
 
@@ -301,13 +364,9 @@ main {
 }
 
 .subtotals {
-  padding: 10px 0 10px 0;
-  /* border-bottom: 2px solid black; */
+  padding: 10px 0 0 0;
   border-top: 2px solid black;
-}
-
-.bottom-right {
-  /* width: 50%; */
+  height: 83px;
 }
 
 .subtotal,
@@ -315,7 +374,6 @@ main {
 .bottom-right {
   display: flex;
   justify-content: space-between;
-  /* width: 50%; */
 }
 
 .amount {
@@ -329,8 +387,6 @@ main {
 }
 
 .summary {
-  /* position: relative;
-  bottom: 43px; */
   border-collapse: collapse;
   overflow: scroll;
   width: 100%;
@@ -338,23 +394,11 @@ main {
 
 .summary tr th {
   margin: 0 20px 0 0;
-  /* text-decoration: underline; */
-  /* border-bottom: 1px solid black; */
   text-align: right;
   font-size: 10px;
   text-decoration: none;
 }
 
-/* #total-holdings {
-  border-right: 1px solid black;
-  border-left: 1px solid black;
-} */
-/* 
-th,
-td {
-  padding-left: 5px;
-  padding-right: 5px;
-} */
 #stock-heading,
 #td1 {
   text-align: center;
@@ -363,4 +407,20 @@ td {
 #td2,
 #td3 {
   text-align: right;
+}
+
+.hold {
+  padding: 25px 25px 0 25px;
+  background: lavenderblush;
+  height: 45vh;
+}
+
+.comp {
+  background: lightblue;
+  padding: 25px;
+  height: 55vh;
+}
+
+#chart {
+  top: -5px;
 }
