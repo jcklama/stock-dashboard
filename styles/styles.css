@@ -277,8 +277,8 @@ main {
   background: pink;
   border-radius: 2px;
   opacity: 0.25;
-  top: 130px;
-  left: 400px;
+  top: 100px;
+  left: 420px;
 }
 
 .fa-info-circle {
@@ -340,7 +340,11 @@ main {
   text-align: center;
 }
 
-/* RIGHT */
+#chart {
+  top: -5px;
+}
+
+/* RIGHT-TOP */
 .right {
   width: 40vw;
   background: white;
@@ -349,12 +353,26 @@ main {
 #composition,
 #holdings {
   margin: 0;
-  border-bottom: 2px solid black;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.hold {
+  padding: 15px;
+  background: lavenderblush;
+  height: 45vh;
+}
+
+.hold .wrapper {
+  background: white;
+  padding: 10px;
+  border-radius: 4px;
 }
 
 .holdings {
-  height: 25vh;
-  overflow: scroll;
+  height: 35vh;
+  width: 450px;
+  margin: 0 auto;
 }
 
 .info {
@@ -363,27 +381,61 @@ main {
   padding-top: 43px;
 }
 
+#holdings-table {
+  width: 100%;
+  font-size: 14px;
+}
+
+#holdings-table tr td {
+  font-size: 12px;
+  text-align: center;
+}
+
+.fa-times:hover,
+.fa-arrow-up,
+.fa-arrow-down {
+  cursor: pointer;
+}
+
+.tbl-subtotal-separator {
+  height: 29vh;
+  overflow: scroll;
+  padding-top: 5px;
+  border-top: 1px solid rgba(0, 0, 0, 0.3);
+}
+
 .subtotals {
   padding: 10px 0 0 0;
-  border-top: 2px solid black;
-  height: 83px;
+  border-top: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 .subtotal,
+.taxes,
 .total,
 .bottom-right {
   display: flex;
   justify-content: space-between;
 }
 
-.amount {
+#subtotal-amount, #tf-amount, #total-amount {
+  margin: 0;
+  font-size: 13px;
+  position: relative;
+  top: 1px;
+}
+
+.subtotal h5,
+.taxes h5,
+.total h5 {
   margin: 0;
 }
 
-.subtotal h3,
-.taxes h3,
-.total h3 {
-  margin: 0;
+/* RIGHT-BOTTOM */
+.comp-wrapper {
+  width: 450px;
+  margin: 0 auto;
+  padding-top: 5px;
+  border-top: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 .summary {
@@ -394,33 +446,17 @@ main {
 
 .summary tr th {
   margin: 0 20px 0 0;
-  text-align: right;
-  font-size: 10px;
+  text-align: center;
   text-decoration: none;
 }
 
-#stock-heading,
-#td1 {
+.summary td {
+  font-size: 12px;
   text-align: center;
 }
 
-#td2,
-#td3 {
-  text-align: right;
-}
-
-.hold {
-  padding: 25px 25px 0 25px;
-  background: lavenderblush;
-  height: 45vh;
-}
-
 .comp {
-  background: lightblue;
   padding: 25px;
   height: 55vh;
-}
-
-#chart {
-  top: -5px;
+  background: lightblue;
 }
