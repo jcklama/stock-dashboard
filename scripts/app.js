@@ -3,6 +3,8 @@ const searchTicker = (function () {
   const form = document.querySelector("#search");
   const resultsDiv = document.querySelector("#results");
   const holdTitle = document.querySelector('#holdings');
+  const bottomSearchBar = document.querySelector(".bottom-search-bar");
+  const holdingsTitle = document.querySelector("#holdings");
 
   const addToHoldingsButton = function () {
     form.insertAdjacentHTML(
@@ -137,7 +139,7 @@ const searchTicker = (function () {
   return {
     recentPrice: 0,
     tickerValue: "",
-    setUpSearchFieldResults: function () {
+    intializeThroughSearch: function () {
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         const tickerValue = tickerSearch.value.toUpperCase();
@@ -151,15 +153,19 @@ const searchTicker = (function () {
           })
           .then(function (data) {
             addResults(data);
-            if (holdTitle.nextElementSibling === null) {
-              holdingsSection.intializeHoldings();
-              holdingsSection.addAddAndHoldingsListeners();
-              compSection.initializeComp();
-              compSection.addCompRowListener();
-            }
-            else if (holdTitle.nextElementSibling !== null) {
-              holdingsSection.addAddAndHoldingsListeners();
-            }
+
+            bottomSearchBar.addEventListener("click", function (e) {
+              const holdingsButton = e.target;
+
+              if (holdingsButton.matches("#addToHoldings") && holdingsTitle.nextElementSibling === null) {
+                holdingsSection.intializeHoldings();
+                compSection.initializeComp();
+                holdingsSection.addHoldingsRow();
+              }
+              else if (holdingsButton.matches("#addToHoldings") && holdTitle.nextElementSibling !== null) {
+                holdingsSection.addHoldingsRow();
+              }
+            })
           })
           .catch(function (e) {
             console.log(e);
@@ -183,22 +189,18 @@ const searchTicker = (function () {
   };
 })();
 
+
 const holdingsSection = (function () {
-  const bottomSearchBar = document.querySelector(".bottom-search-bar");
   const holdingsTitle = document.querySelector("#holdings");
   const tickerSearch = document.querySelector("#tickerSearch");
 
   return {
+    subTotalOfCurrent: 0,
     holdingsCounter: 0,
-    arrayOfTickers: [],
     intializeHoldings: function () {
-      bottomSearchBar.addEventListener("click", function (e) {
-        const holdingsButton = e.target;
-
-        if (holdingsButton.matches("#addToHoldings") && holdingsTitle.nextElementSibling === null) {
-          holdingsTitle.insertAdjacentHTML(
-            "afterend",
-            `<div class="holdings">
+      holdingsTitle.insertAdjacentHTML(
+        "afterend",
+        `<div class="holdings">
                   <div class="tbl-subtotal-separator">
                     <table id="holdings-table">
                       <tr id="holdings-headings">
@@ -223,36 +225,28 @@ const holdingsSection = (function () {
                   </div>
                 </div>
               </div>`
-          );
-        }
-        tickerSearch.value = '';
-      })
+      );
     },
-    addAddAndHoldingsListeners: function () {
+    addHoldingsRow: function () {
       const tickerValue = tickerSearch.value.toUpperCase();
-      holdingsSection.arrayOfTickers.push(tickerValue);
 
       let recentPrice = searchTicker.recentPrice;
 
-      // to be added as an event listener
-      const addHoldingAndUpdate = function (e) {
-        const holdingsButton = e.target;
+      const checkUniqueStock = function () {
+        const tickerSymbols = Array.prototype.slice.call(document.querySelectorAll('.ticker-symb'));
+        const checkSameTicker = tickerSymbols.filter((ticker) => {
+          if (ticker.innerHTML.toUpperCase() === tickerValue) {
+            return true;
+          }
+        });
+        return checkSameTicker.length;
+      }
 
-        const checkNumberOfSearchedStock = function () {
-          const tickerSymbols = Array.prototype.slice.call(document.querySelectorAll('.ticker-symb'));
-          const checkSameTicker = tickerSymbols.filter((ticker) => {
-            if (ticker.innerHTML.toUpperCase() === tickerValue) {
-              return true;
-            }
-          });
-          return checkSameTicker.length;
-        }
-
-        if (holdingsButton.matches("#addToHoldings") && holdingsTitle.nextElementSibling !== null && checkNumberOfSearchedStock() === 0) {
-          const holdHeadings = document.querySelector('#holdings-headings');
-          holdHeadings.insertAdjacentHTML(
-            "afterend",
-            `<tr class="holding-row holding-row-${holdingsSection.holdingsCounter}">
+      if (checkUniqueStock() === 0) {
+        const holdHeadings = document.querySelector('#holdings-headings');
+        holdHeadings.insertAdjacentHTML(
+          "afterend",
+          `<tr class="holding-row holding-row-${holdingsSection.holdingsCounter}">
                 <td class="ticker-symb ticker-symb-${holdingsSection.holdingsCounter}">${tickerValue}</td>
                 <td class="holdings-price holdings-price-${holdingsSection.holdingsCounter}">${recentPrice}</td>
                 <td class="holdings-quant holdings-quant-${holdingsSection.holdingsCounter}">0
@@ -267,105 +261,120 @@ const holdingsSection = (function () {
                   <i class="fas fa-times fa-times-${holdingsSection.holdingsCounter}"></i>
                 </td>
               </tr>`
-          );
-          const upArrow = document.querySelector(`.fa-arrow-up-${holdingsSection.holdingsCounter}`);
-          const downArrow = document.querySelector(`.fa-arrow-down-${holdingsSection.holdingsCounter}`);
-          const times = document.querySelector(`.fa-times-${holdingsSection.holdingsCounter}`);
+        );
+        const upArrow = document.querySelector(`.fa-arrow-up-${holdingsSection.holdingsCounter}`);
+        const downArrow = document.querySelector(`.fa-arrow-down-${holdingsSection.holdingsCounter}`);
+        const times = document.querySelector(`.fa-times-${holdingsSection.holdingsCounter}`);
 
-          upArrow.addEventListener("click", function (e) {
-            const clicked = e.target;
-            const clickedMapper = Array.prototype.slice.call(clicked.classList)[2];
-            const extractedMapper = clickedMapper.match(/\d/)[0]; // the number of the class with numerical index
-            let innerQuant = Number(document.querySelector(`.holdings-quant-${extractedMapper}`).innerHTML);
+        upArrow.addEventListener("click", function (e) {
+          const clicked = e.target;
+          const clickedMapper = Array.prototype.slice.call(clicked.classList)[2];
+          const extractedMapper = clickedMapper.match(/\d/)[0]; // the number of the class with numerical index
+          let innerQuant = Number(document.querySelector(`.holdings-quant-${extractedMapper}`).innerHTML);
 
-            // update quantity
-            let updatedQuant = innerQuant + 1;
+          // update quantity
+          let updatedQuant = innerQuant + 1;
+          document.querySelector(`.holdings-quant-${extractedMapper}`).innerHTML = updatedQuant;
+          updateTotals();
+
+          const tickerOfMapped = document.querySelector(`.ticker-symb-${extractedMapper}`).innerHTML;
+          const priceOfMapped = document.querySelector(`.holdings-price-${extractedMapper}`).innerHTML
+          const quantOfMapped = document.querySelector(`.holdings-quant-${extractedMapper}`).innerHTML
+          compSection.addCompRow(tickerOfMapped, priceOfMapped, quantOfMapped);
+        });
+
+        downArrow.addEventListener("click", function (e) {
+          const clicked = e.target;
+          const clickedMapper = Array.prototype.slice.call(clicked.classList)[2];
+          const extractedMapper = clickedMapper.match(/\d/)[0];
+          let innerQuant = Number(document.querySelector(`.holdings-quant-${extractedMapper}`).innerHTML);
+
+          // update quantity
+          if (innerQuant > 0) {
+            let updatedQuant = innerQuant - 1;
             document.querySelector(`.holdings-quant-${extractedMapper}`).innerHTML = updatedQuant;
             updateTotals();
-          });
 
-          downArrow.addEventListener("click", function (e) {
-            const clicked = e.target;
-            const clickedMapper = Array.prototype.slice.call(clicked.classList)[2];
-            const extractedMapper = clickedMapper.match(/\d/)[0];
-            let innerQuant = Number(document.querySelector(`.holdings-quant-${extractedMapper}`).innerHTML);
+            const tickerOfMapped = document.querySelector(`.ticker-symb-${extractedMapper}`).innerHTML;
+            const priceOfMapped = Number(document.querySelector(`.holdings-price-${extractedMapper}`).innerHTML);
+            const quantOfMapped = Number(document.querySelector(`.holdings-quant-${extractedMapper}`).innerHTML);
+            compSection.addCompRow(tickerOfMapped, priceOfMapped, quantOfMapped);
+          }
+        });
 
-            // update quantity
-            if (innerQuant > 0) {
-              let updatedQuant = innerQuant - 1;
-              document.querySelector(`.holdings-quant-${extractedMapper}`).innerHTML = updatedQuant;
-              updateTotals();
+        times.addEventListener('click', function (e) {
+          const clicked = e.target;
+          const clickedMapper = Array.prototype.slice.call(clicked.classList)[2];
+          const extractedMapper = clickedMapper.match(/\d/)[0];
+
+          const mappedTicker = document.querySelector(`.ticker-symb-${extractedMapper}`).innerHTML;
+          const compRows = document.querySelectorAll('.comp-row');
+
+          compRows.forEach((row) => {
+            const compTicker = row.children[0].innerHTML;
+            const mapperOfTheRow = row.children[0].classList[1].match(/\d/)[0];
+            if (mappedTicker === compTicker) {
+              document.querySelector(`.comp-row-${mapperOfTheRow}`).remove();
             }
           });
 
-          times.addEventListener('click', function (e) {
-            const clicked = e.target;
-            const clickedMapper = Array.prototype.slice.call(clicked.classList)[2];
-            const extractedMapper = clickedMapper.match(/\d/)[0];
+          document.querySelector(`.holding-row-${extractedMapper}`).remove();
+          updateTotals();
+          compSection.recalcCompPercentages();
 
-            // remove the ticker symbol from arrayOfTickers
-            holdingsSection.arrayOfTickers.filter((ticker) => {
-              if (ticker !== document.querySelector(`.ticker-symb-${extractedMapper}`).innerHTML) {
-                return true;
-              }
-            });
-            document.querySelector(`.holding-row-${extractedMapper}`).remove();
-            updateTotals();
-            bottomSearchBar.removeEventListener("click", addHoldingAndUpdate);
-            // bottomSearchBar.addEventListener("click", addHoldingAndUpdate);
-          });
-
-          const updateTotals = function () {
-            const holdingRows = Array.prototype.slice.call(document.querySelectorAll(`.holding-row`));
-
-            // update subtotal
-            const subTotal = holdingRows.reduce((total, current) => {
-              const quantity = Number(current.children[2].innerHTML);
-              const price = Number(current.children[1].innerHTML)
-              return (total + (quantity * price));
-            }, 0);
-            document.querySelector('#subtotal-amount').innerHTML = `${subTotal.toFixed(2)}`;
-
-            // update taxes & fees
-            let taxesFeesUpdated = subTotal * 0.13;
-            document.querySelector('#tf-amount').innerHTML = `${taxesFeesUpdated.toFixed(2)}`;
-
-            // update total
-            let totalUpdated = subTotal + taxesFeesUpdated;
-            document.querySelector('#total-amount').innerHTML = `${totalUpdated.toFixed(2)}`;
+          const holdingHeadings = document.querySelector('#holdings-headings');
+          const subtotal = document.querySelector('#subtotal-amount');
+          const tAndF = document.querySelector('#tf-amount');
+          const total = document.querySelector('#total-amount');
+          if (holdingHeadings.nextElementSibling === null) {
+            subtotal.innerHTML = "";
+            tAndF.innerHTML = "";
+            total.innerHTML = "";
           }
+        });
 
-          holdingsSection.holdingsCounter += 1;
-        };
-      };
-      bottomSearchBar.addEventListener("click", addHoldingAndUpdate);
+        const updateTotals = function () {
+          const holdingRows = Array.prototype.slice.call(document.querySelectorAll(`.holding-row`));
+
+          // update subtotal
+          const subTotal = holdingRows.reduce((total, current) => {
+            const quantity = Number(current.children[2].innerHTML);
+            const price = Number(current.children[1].innerHTML)
+            return (total + (quantity * price));
+          }, 0);
+          document.querySelector('#subtotal-amount').innerHTML = `${subTotal.toFixed(2)}`;
+          holdingsSection.subTotalOfCurrent = subTotal;
+
+          // update taxes & fees
+          let taxesFeesUpdated = subTotal * 0.13;
+          document.querySelector('#tf-amount').innerHTML = `${taxesFeesUpdated.toFixed(2)}`;
+
+          // update total
+          let totalUpdated = subTotal + taxesFeesUpdated;
+          document.querySelector('#total-amount').innerHTML = `${totalUpdated.toFixed(2)}`;
+        }
+
+        holdingsSection.holdingsCounter += 1;
+      }
     }
   };
 })();
 
 const compSection = (function () {
   const compTitle = document.querySelector("#composition");
-  const bottomSearchBar = document.querySelector(".bottom-search-bar");
-  const hold = document.querySelector(".hold");
-  const tickerSearch = document.querySelector("#tickerSearch");
-
   return {
     compRowCounter: 0,
     initializeComp: function () {
-      bottomSearchBar.addEventListener("click", function (e) {
-        const holdingsButton = e.target;
-
-        if (holdingsButton.matches("#addToHoldings") && compTitle.nextElementSibling === null) {
-          compTitle.insertAdjacentHTML(
-            "afterend",
-            `<div class="comp-wrapper">
+      compTitle.insertAdjacentHTML(
+        "afterend",
+        `<div class="comp-wrapper">
             <table class="summary">
-              <tr id="comp-headings">
+              <tr id="composition-headings">
                 <th id="stock-heading">
                   Stock
                 </th>
                 <th id="total-holdings">
-                  Total Holdings
+                  Total Holdings 
                 </th>
                 <th id="portfolio-heading">
                   Portfolio %
@@ -373,54 +382,110 @@ const compSection = (function () {
               </tr>
             </table>
           </div>`
-          );
-        }
-      });
+      );
     },
-    addCompRowListener: function () {
-      const tickerValue = tickerSearch.value.toUpperCase();
+    addCompRow: function (tickerOfMapped, priceOfMapped, quantOfMapped) {
 
-      hold.addEventListener("click", function (e) {
-        const clicked = e.target;
-        const compHeadings = document.querySelector("#comp-headings");
+      const checkIfStockInComp = function () {
         const compTickers = Array.prototype.slice.call(document.querySelectorAll(".td-symbol"));
         const checkAddedComp = compTickers.filter((ticker) => {
-          if (ticker.innerHTML === holdingsSection.arrayOfTickers[holdingsSection.arrayOfTickers.length - 1]) {
+          if (ticker.innerHTML.toUpperCase() === tickerOfMapped) {
             return true;
           }
         });
+        return checkAddedComp.length;
+      }
 
-        if (clicked.matches(".fa-arrow-up") && checkAddedComp.length === 0) {
-          compHeadings.insertAdjacentHTML('afterend',
-            `<tr>
-          <td class="td-symbol td-symbol-${compSection.compRowCounter}"></td>
-          <td class="td-totals></td>
-          <td class="td-pcnt"></td>
-        </tr>`);
+      const updateValues = function (ticker, totalHoldings) {
+        const priceTimesQuant = priceOfMapped * quantOfMapped;
 
-          const ticker = document.querySelector(".td-symbol");
-          const totalHoldings = document.querySelector('.td-totals');
-          const portPercent = document.querySelector('.td-pcnt');
-          const allHoldingAmounts = Array.prototype.slice.call(document.querySelectorAll('.td-totals'));
-
-          // console.log(allHoldingAmounts);
-          const total = allHoldingAmounts.reduce((total, current) => {
-            const inner = Number(current.innerHTML);
-            return total + inner;
+        const updatePercentages = function () {
+          const holdingRows = Array.prototype.slice.call(document.querySelectorAll(`.holding-row`));
+          const subTotal = holdingRows.reduce((total, current) => {
+            const quantity = Number(current.children[2].innerHTML);
+            const price = Number(current.children[1].innerHTML)
+            return total + quantity * price;
           }, 0);
-          // console.log(total);
 
-          ticker.innerHTML = tickerValue;
-          // totalHoldings.innerHTML = document.querySelector('.td-totals').innerHTML;
-          // portPercent.innerHTML = `${document.querySelector()}`;
+          const percentageColumn = Array.prototype.slice.call(document.querySelectorAll('.td-pcnt'));
+          percentageColumn.forEach((row) => {
+            const rowMapper = Number(row.classList[1].match(/\d/)[0])
+            const rowStockTotal = Number(document.querySelector(`.td-totals-${rowMapper}`).innerHTML.match(/\d+.\d+/));
 
-          compSection.compRowCounter += 1;
+            if ((rowStockTotal / subTotal * 100) % 1 === 0) {
+              row.innerHTML = `${(rowStockTotal / subTotal) * 100}%`;
+            }
+            else {
+              row.innerHTML = `${((rowStockTotal / subTotal) * 100).toFixed(2)}%`;
+            }
+          });
+        }
 
+        ticker.innerHTML = tickerOfMapped;
+        totalHoldings.innerHTML = `$${priceTimesQuant.toFixed(2)}`;
+        updatePercentages();
+      }
+
+      if (checkIfStockInComp() === 0) {
+        const compHeadings = document.querySelector("#composition-headings");
+        compHeadings.insertAdjacentHTML('afterend',
+          `<tr class="comp-row comp-row-${compSection.compRowCounter}">
+            <td class="td-symbol td-symbol-${compSection.compRowCounter}"></td>
+            <td class="td-totals td-totals-${compSection.compRowCounter}"></td>
+            <td class="td-pcnt td-pcnt-${compSection.compRowCounter}"></td>
+          </tr>`);
+
+        const ticker = document.querySelector(`.td-symbol-${compSection.compRowCounter}`);
+        const totalHoldings = document.querySelector(`.td-totals-${compSection.compRowCounter}`);
+
+        updateValues(ticker, totalHoldings);
+
+        compSection.compRowCounter += 1;
+      }
+      else {
+        const getNewMapper = function () {
+          const compTickers = Array.prototype.slice.call(document.querySelectorAll(".td-symbol"));
+          const compareList = compTickers.filter((ticker) => {
+            if (ticker.innerHTML.toUpperCase() === tickerOfMapped) {
+              return true;
+            }
+          });
+          const getMatchedMapper = compareList.map((matched) => {
+            return matched.classList[1].match(/\d/)[0];
+          });
+          return getMatchedMapper[0];
+        }
+
+        console.log(`mapper of the stock in comp: ${getNewMapper()}`);
+
+        const ticker = document.querySelector(`.td-symbol-${getNewMapper()}`);
+        const totalHoldings = document.querySelector(`.td-totals-${getNewMapper()}`);
+
+        updateValues(ticker, totalHoldings);
+      }
+    },
+    recalcCompPercentages: function () {
+      const holdingRows = Array.prototype.slice.call(document.querySelectorAll(`.holding-row`));
+      const subTotal = holdingRows.reduce((total, current) => {
+        const quantity = Number(current.children[2].innerHTML);
+        const price = Number(current.children[1].innerHTML)
+        return total + quantity * price;
+      }, 0);
+
+      const percentageColumn = Array.prototype.slice.call(document.querySelectorAll('.td-pcnt'));
+      percentageColumn.forEach((row) => {
+        const rowMapper = Number(row.classList[1].match(/\d/)[0])
+        const rowStockTotal = Number(document.querySelector(`.td-totals-${rowMapper}`).innerHTML.match(/\d+.\d+/));
+
+        if ((rowStockTotal / subTotal * 100) % 1 === 0) {
+          row.innerHTML = `${(rowStockTotal / subTotal) * 100}%`;
+        }
+        else {
+          row.innerHTML = `${((rowStockTotal / subTotal) * 100).toFixed(2)}%`;
         }
       });
     }
   }
 })();
 
-searchTicker.setUpSearchFieldResults();
-
+searchTicker.intializeThroughSearch();

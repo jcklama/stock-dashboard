@@ -277,8 +277,8 @@ main {
   background: pink;
   border-radius: 2px;
   opacity: 0.25;
-  top: 100px;
-  left: 420px;
+  top: 95px;
+  left: 450px;
 }
 
 .fa-info-circle {
@@ -292,7 +292,7 @@ main {
 #searchNote {
   font-size: 9px;
   position: absolute;
-  top: -28px;
+  top: -29px;
   left: 0;
   width: 285px;
   height: 25px;
