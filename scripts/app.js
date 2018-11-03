@@ -248,7 +248,7 @@ const holdingsSection = (function () {
           "afterend",
           `<tr class="holding-row holding-row-${holdingsSection.holdingsCounter}">
                 <td class="ticker-symb ticker-symb-${holdingsSection.holdingsCounter}">${tickerValue}</td>
-                <td class="holdings-price holdings-price-${holdingsSection.holdingsCounter}">${recentPrice}</td>
+                <td class="holdings-price holdings-price-${holdingsSection.holdingsCounter}">$${recentPrice}</td>
                 <td class="holdings-quant holdings-quant-${holdingsSection.holdingsCounter}">0
                 </td>
                 <td>
@@ -278,7 +278,7 @@ const holdingsSection = (function () {
           updateTotals();
 
           const tickerOfMapped = document.querySelector(`.ticker-symb-${extractedMapper}`).innerHTML;
-          const priceOfMapped = document.querySelector(`.holdings-price-${extractedMapper}`).innerHTML
+          const priceOfMapped = document.querySelector(`.holdings-price-${extractedMapper}`).innerHTML.match(/\d+.\d+/)[0];
           const quantOfMapped = document.querySelector(`.holdings-quant-${extractedMapper}`).innerHTML
           compSection.addCompRow(tickerOfMapped, priceOfMapped, quantOfMapped);
         });
@@ -296,7 +296,7 @@ const holdingsSection = (function () {
             updateTotals();
 
             const tickerOfMapped = document.querySelector(`.ticker-symb-${extractedMapper}`).innerHTML;
-            const priceOfMapped = Number(document.querySelector(`.holdings-price-${extractedMapper}`).innerHTML);
+            const priceOfMapped = Number(document.querySelector(`.holdings-price-${extractedMapper}`).innerHTML.match(/\d+.\d+/)[0]);
             const quantOfMapped = Number(document.querySelector(`.holdings-quant-${extractedMapper}`).innerHTML);
             compSection.addCompRow(tickerOfMapped, priceOfMapped, quantOfMapped);
           }
@@ -339,19 +339,19 @@ const holdingsSection = (function () {
           // update subtotal
           const subTotal = holdingRows.reduce((total, current) => {
             const quantity = Number(current.children[2].innerHTML);
-            const price = Number(current.children[1].innerHTML)
+            const price = Number(current.children[1].innerHTML.match(/\d+.\d+/)[0]);
             return (total + (quantity * price));
           }, 0);
-          document.querySelector('#subtotal-amount').innerHTML = `${subTotal.toFixed(2)}`;
+          document.querySelector('#subtotal-amount').innerHTML = `$${subTotal.toFixed(2)}`;
           holdingsSection.subTotalOfCurrent = subTotal;
 
           // update taxes & fees
           let taxesFeesUpdated = subTotal * 0.13;
-          document.querySelector('#tf-amount').innerHTML = `${taxesFeesUpdated.toFixed(2)}`;
+          document.querySelector('#tf-amount').innerHTML = `$${taxesFeesUpdated.toFixed(2)}`;
 
           // update total
           let totalUpdated = subTotal + taxesFeesUpdated;
-          document.querySelector('#total-amount').innerHTML = `${totalUpdated.toFixed(2)}`;
+          document.querySelector('#total-amount').innerHTML = `$${totalUpdated.toFixed(2)}`;
         }
 
         holdingsSection.holdingsCounter += 1;
@@ -403,7 +403,7 @@ const compSection = (function () {
           const holdingRows = Array.prototype.slice.call(document.querySelectorAll(`.holding-row`));
           const subTotal = holdingRows.reduce((total, current) => {
             const quantity = Number(current.children[2].innerHTML);
-            const price = Number(current.children[1].innerHTML)
+            const price = Number(current.children[1].innerHTML.match(/\d+.\d+/)[0]);
             return total + quantity * price;
           }, 0);
 
@@ -414,6 +414,9 @@ const compSection = (function () {
 
             if ((rowStockTotal / subTotal * 100) % 1 === 0) {
               row.innerHTML = `${(rowStockTotal / subTotal) * 100}%`;
+            }
+            else if (rowStockTotal === 0 && subTotal === 0) {
+              row.innerHTML = "0%";
             }
             else {
               row.innerHTML = `${((rowStockTotal / subTotal) * 100).toFixed(2)}%`;
@@ -456,8 +459,6 @@ const compSection = (function () {
           return getMatchedMapper[0];
         }
 
-        console.log(`mapper of the stock in comp: ${getNewMapper()}`);
-
         const ticker = document.querySelector(`.td-symbol-${getNewMapper()}`);
         const totalHoldings = document.querySelector(`.td-totals-${getNewMapper()}`);
 
@@ -468,17 +469,20 @@ const compSection = (function () {
       const holdingRows = Array.prototype.slice.call(document.querySelectorAll(`.holding-row`));
       const subTotal = holdingRows.reduce((total, current) => {
         const quantity = Number(current.children[2].innerHTML);
-        const price = Number(current.children[1].innerHTML)
+        const price = Number(current.children[1].innerHTML.match(/\d+.\d+/)[0]);
         return total + quantity * price;
       }, 0);
 
       const percentageColumn = Array.prototype.slice.call(document.querySelectorAll('.td-pcnt'));
       percentageColumn.forEach((row) => {
-        const rowMapper = Number(row.classList[1].match(/\d/)[0])
+        const rowMapper = Number(row.classList[1].match(/\d/)[0]);
         const rowStockTotal = Number(document.querySelector(`.td-totals-${rowMapper}`).innerHTML.match(/\d+.\d+/));
 
         if ((rowStockTotal / subTotal * 100) % 1 === 0) {
           row.innerHTML = `${(rowStockTotal / subTotal) * 100}%`;
+        }
+        else if (rowStockTotal === 0 && subTotal === 0) {
+          row.innerHTML = "0%";
         }
         else {
           row.innerHTML = `${((rowStockTotal / subTotal) * 100).toFixed(2)}%`;
