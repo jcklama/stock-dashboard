@@ -493,3 +493,6 @@ const compSection = (function () {
 })();
 
 searchTicker.intializeThroughSearch();
+// console.log(searchTicker.recentPrice);
+// In the module design pattern, when invoking the 'searchTicker', since the 
+// return value is an object, the following '.recentPrice' is valid
