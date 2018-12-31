@@ -1,4 +1,4 @@
-Stock dashboard
+*Stock dashboard*
 Simple stock app that performs a ticker search and calculates portfolio holdings by dollar value and percentage value
 
 Getting Started
